@@ -2,6 +2,8 @@
 #ifndef MYSTL_ALLOCATOR_H_
 #define MYSTL_ALLOCATOR_H_
 
+#include "construct.h"
+#include "utilities.h"
 namespace mystl
 {
 
@@ -64,33 +66,38 @@ namespace mystl
 	template<class T>
 	inline void allocator<T>::construct(T* ptr)
 	{
-
+		mystl::construct(ptr);
 	}
 
 	template<class T>
 	inline void allocator<T>::construct(T* ptr, const T& value)
 	{
+		mystl::construct(ptr, value);
 	}
 
 	template<class T>
 	inline void allocator<T>::construct(T* ptr, T&& value)
 	{
+		mystl::construct(ptr, mystl::move(value));
 	}
 
 	template<class T>
 	template<class ...Args>
 	inline void allocator<T>::construct(T* ptr, Args && ...args)
 	{
+		mystl::construct(ptr, mystl::forward<Args>(args)...);
 	}
 
 	template<class T>
 	inline void allocator<T>::destroy(T* ptr)
 	{
+		mystl::destroy(ptr);
 	}
 
 	template<class T>
 	inline void allocator<T>::destroy(T* first, T* end)
 	{
+		mystl::destroy(first, end);
 	}
 
 };
