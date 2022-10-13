@@ -65,7 +65,7 @@ namespace mystl
 	void destroy(ForwardIter first, ForwardIter last)
 	{
 		destroy_cat(first, last, std::is_trivially_destructible<typename iterator_traits<ForwardIter>::value_type>{});
-	}
+	} 
 };
 
 #ifdef _MSC_VER

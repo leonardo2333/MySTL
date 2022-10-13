@@ -12,7 +12,7 @@ namespace mystl
 
 	template<bool b>
 	using m_bool_constant = m_integral_constant<bool, b>;
-	
+	 
 	typedef m_bool_constant<true> m_true_type;
 	typedef m_bool_constant<false> m_false_type;
 

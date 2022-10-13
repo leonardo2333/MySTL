@@ -6,7 +6,7 @@
 #include "utilities.h"
 namespace mystl
 {
-
+	 
 	template<class T>
 	class allocator
 	{

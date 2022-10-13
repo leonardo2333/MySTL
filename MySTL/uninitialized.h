@@ -9,7 +9,7 @@
 #include "utilities.h"
 
 namespace mystl
-{
+{ 
 	/************************************************************************************/
 	//uninitailized_copy
 	//把[first,last)上的内容复制到以result为起始处的空间，返回复制结束的位置

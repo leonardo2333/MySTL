@@ -7,7 +7,7 @@
 #include "type_traits.h"
 
 namespace mystl
-{
+{ 
 	//5ÖÖµü´úÆ÷
 	struct input_iterator_tag{};
 	struct output_iterator_tag{};

@@ -6,7 +6,7 @@
 #include <cstring>
 #include "utilities.h"
 
-
+ 
 
 
 #endif // !MYSTL_ALGOBASE_H_

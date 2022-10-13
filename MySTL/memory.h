@@ -14,7 +14,7 @@
 #include "uninitialized.h"
 
 namespace mystl
-{
+{ 
 	//获取对象地址
 	template<class T>
 	constexpr T* address_of(T& value)noexcept

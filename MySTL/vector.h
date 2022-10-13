@@ -9,7 +9,7 @@
 #include "utilities.h"
 #include "memory.h"
 namespace mystl
-{
+{ 
 #ifdef max
 #pragma message("#undefining macro max")
 #undef max
