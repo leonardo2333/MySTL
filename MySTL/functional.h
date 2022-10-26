@@ -241,8 +241,98 @@ namespace mystl
 
 
 	//哈希函数对象
-	//to be finished
+	
+	//对于大部分类型，hash function什么也不做
+	template<class T>
+	struct hash
+	{
+	};
 
+	//对指针的偏特化
+	template<class T>
+	struct hash<T*>
+	{
+		size_t operator()(T* p)const noexcept
+		{
+			return reinterpret_cast<size_t>(p);
+		}
+	};
+
+	//对整型类型，返回原值
+	//该处定义MYSTL_HASH_FUNC_INTEGER宏,用于批量定义整型类型的哈希函数对象
+#define MYSTL_HASH_FUNC_INTEGER(Type) \
+	template<>\
+	struct hash<Type>\
+	{\
+		size_t operator()(Type x)const noexcept\
+		{\
+			return static_cast<size_t>(x);\
+		}\
+	};
+
+	MYSTL_HASH_FUNC_INTEGER(bool);
+	MYSTL_HASH_FUNC_INTEGER(char);
+	MYSTL_HASH_FUNC_INTEGER(unsigned char);
+	MYSTL_HASH_FUNC_INTEGER(signed char);
+	MYSTL_HASH_FUNC_INTEGER(wchar_t);
+	MYSTL_HASH_FUNC_INTEGER(char16_t);
+	MYSTL_HASH_FUNC_INTEGER(char32_t);
+	MYSTL_HASH_FUNC_INTEGER(short);
+	MYSTL_HASH_FUNC_INTEGER(unsigned short);
+	MYSTL_HASH_FUNC_INTEGER(int);
+	MYSTL_HASH_FUNC_INTEGER(unsigned int);
+	MYSTL_HASH_FUNC_INTEGER(long);
+	MYSTL_HASH_FUNC_INTEGER(unsigned long);
+	MYSTL_HASH_FUNC_INTEGER(long long);
+	MYSTL_HASH_FUNC_INTEGER(unsigned long long);
+
+#undef MYSTL_HASH_FUNC_INTEGER
+
+	//对于浮点数,逐位哈希
+	inline size_t bitwise_hash(const unsigned char* first, size_t count)
+	{
+#if(_MSC_VER&&_WIN64)||((__GNUC__||__clang__)&&__SIZEOF_POINTER__==8)
+		const size_t fnv_offset = 14695981039346656037ull;
+		const size_t fnv_prime = 1099511628211ull;
+#else
+		const size_t fnv_offset = 2166136261u;
+		const size_t fnv_prime = 16777619u;
+#endif
+		size_t res = fnv_offset;
+		for (size_t i = 0; i < count; ++i)
+		{
+			res ^= (size_t)first[i];
+			res *= fnv_prime;
+		}
+		return res;
+	}
+
+	template<>
+	struct hash<float>
+	{
+		size_t operator()(const float& x)
+		{
+			return x == 0.0f ? 0 : bitwise_hash((const unsigned char*)&x, sizeof(float));
+		}
+	};
+
+	template<>
+	struct hash<double>
+	{
+		size_t operator()(const double& x)
+		{
+			return x == 0.0f ? 0 : bitwise_hash((const unsigned char*)&x, sizeof(double));
+		}
+	};
+
+	template<>
+	struct hash<long double>
+	{
+		size_t operator()(const long double& x)
+		{
+			return x == 0.0f ? 0 : bitwise_hash((const unsigned char*)&x, sizeof(double));
+		}
+	};
 }
 
 
