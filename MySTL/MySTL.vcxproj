@@ -130,9 +130,11 @@
     <ClCompile Include="MySTL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="algo.h" />
     <ClInclude Include="algobase.h" />
     <ClInclude Include="allocator.h" />
     <ClInclude Include="construct.h" />
+    <ClInclude Include="functional.h" />
     <ClInclude Include="iterator.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="type_traits.h" />
