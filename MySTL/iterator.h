@@ -9,11 +9,11 @@
 namespace mystl
 { 
 	//5种迭代器
-	struct input_iterator_tag{};
-	struct output_iterator_tag{};
-	struct forward_iterator_tag:public input_iterator_tag{};
-	struct bidirectional_iterator_tag:public forward_iterator_tag{};
-	struct random_access_iterator_tag:public bidirectional_iterator_tag{};
+	struct input_iterator_tag{};//只读
+	struct output_iterator_tag{};//只写
+	struct forward_iterator_tag:public input_iterator_tag{};//前向访问
+	struct bidirectional_iterator_tag:public forward_iterator_tag{};//双向访问
+	struct random_access_iterator_tag:public bidirectional_iterator_tag{};//随机访问
 
 	//iterator模板
 	template<class Category,class T,class Distance=ptrdiff_t,class Pointer=T*,class Reference=T&>
