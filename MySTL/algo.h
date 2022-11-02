@@ -1958,7 +1958,7 @@ namespace mystl
 		*last = value;
 	}
 	//可能存在越界问题?×
-	//insertion_sort中派出了value<*first的情况
+	//insertion_sort中排除了value<*first的情况
 
 	//unchecked_insertion_sort
 	//插入排序函数
@@ -2019,9 +2019,248 @@ namespace mystl
 		}
 	}
 	
+	//unchecked_partition
+	//分割函数
+	template<class RandomIter, class T,class Compare>
+	RandomIter unchecked_partition(RandomIter first, RandomIter last, const T& pivot,Compare comp)
+	{
+		while (true)
+		{
+			while (comp( * first ,pivot))
+				++first;
+			--last;
+			while (comp(pivot , *last))
+				--last;
+			if (!(first < last))
+				return first;
+			mystl::iter_swap(first, last);
+			++first;
+		}
+	}
 
+	//内省式排序，先进行快速排序，当分割行为有恶化倾向时，改用堆排序
+	template<class RandomIter, class Size,class Compare>
+	void intro_sort(RandomIter first, RandomIter last, Size depth_limit,Compare comp)
+	{
+		while (static_cast<size_t>(last - first) > kSmallSectionSize)
+		{
+			if (depth_limit == 0)//到达最大分割深度限制
+			{
+				mystl::partial_sort(first, last, last,comp);//改用堆排序
+				return;
+			}
+			--depth_limit;
+			auto mid = mystl::median(*first, *(first + (last - first) / 2), *(last - 1));
+			auto cut = mystl::unchecked_partition(first, last, mid,comp);
+			mystl::intro_sort(cut, last, depth_limit,comp);//对[cur,last)排序
+			last = cut;//对[first,cur)排序
+		}
+	}
 
+	//unchecked_linear_insert
+	//插入排序辅助函数
+	template<class RandomIter, class T,class Compare>
+	void unchecked_linear_insert(RandomIter last, const T& value,Compare comp)
+	{
+		auto next = last;
+		--next;
+		while (comp(value , *next))
+		{
+			*last = *next;
+			last = next;
+			--next;
+		}
+		*last = value;
+	}
+	//可能存在越界问题?×
+	//insertion_sort中排除了value<*first的情况
 
+	//unchecked_insertion_sort
+	//插入排序函数
+	template<class RandomIter,class Compare>
+	void unchecked_insertion_sort(RandomIter first, RandomIter last,Compare comp)
+	{
+		for (auto i = first + 1; i != last; ++i)
+		{
+			mystl::unchecked_linear_insert(i, *i,comp);
+		}
+	}
+
+	//insertion_sort
+	//插入排序函数
+	template<class RandomIter,class Compare>
+	void insertion_sort(RandomIter first, RandomIter last,Compare comp)
+	{
+		if (first == last)
+			return;
+		for (auto i = first + 1; i != last; ++i)
+		{
+			auto value = *i;
+			if (comp(value , *first))
+			{
+				mystl::copy_backward(first, i, i + 1);
+				*first = value;
+			}
+			else
+			{
+				mystl::unchecked_insertion_sort(i, value,comp);
+			}
+		}
+	}
+
+	//final_insertion_sort
+	//最终插入排序函数
+	template<class RandomIter,class Compare>
+	void final_isertion_sort(RandomIter first, RandomIter last,Compare comp)
+	{
+		if (static_cast<size_t>(last - first) > kSmallSectionSize)
+		{
+			mystl::insertion_sort(first, first + kSmallSectionSize,comp);
+			mystl::unchecked_insertion_sort(first + kSmallSectionSize, last,comp);
+		}
+		else
+		{
+			mystl::insertion_sort(first, last,comp);
+		}
+	}
+
+	template<class RandomIter, class Compare >
+	void sort(RandomIter first, RandomIter last,Compare comp)
+	{
+		if (first != last)
+		{
+			mystl::intro_sort(first, last, slg2(last - first) * 2,comp);
+			mystl::final_isertion_sort(first, last,comp);
+		}
+	}
+
+	//nth_element
+	//对序列重排，使小于第n个元素的排在前，大于的排在后
+	template<class RandomIter>
+	void nth_element(RandomIter first, RandomIter nth, RandomIter last)
+	{
+		//nth直接给定了？
+		//为什么不直接调用unchecked_partition?
+		//传进来的nth只是指向第n个位置，对应的值并不是正确的值
+		//通过一次次的二分，每次二分确定一个cut
+		//根据cut和nth位置关系对对应区间进一步细分，直到得到结果
+		//时间复杂度O(nlogn)
+		if (nth == last)
+			return;
+		while (last - first > 3)
+		{
+			auto cut = mystl::unchecked_partition(first, last, 
+				mystl::median(*first, *(last - 1), *(first + (last - first) / 2));
+			if (cut <= nth)
+				first = cut;
+			else
+				last = cut;
+		}
+		mystl::insertion_sort(first, last);
+	}
+	
+	template<class RandomIter,class Compare>
+	void nth_element(RandomIter first, RandomIter nth, RandomIter last,Compare comp)
+	{
+		if (nth == last)
+			return;
+		while (last - first > 3)
+		{
+			auto cut = mystl::unchecked_partition(first, last,
+				mystl::median(*first, *(last - 1), *(first + (last - first) / 2),comp);
+			if (cut <= nth)
+				first = cut;
+			else
+				last = cut;
+		}
+		mystl::insertion_sort(first, last,comp);
+	}
+
+	//unique_copy
+	//forward_iterator版本
+	template<class InputIter,class ForwardIter>
+	ForwardIter unique_copy_dispatch(InputIter first, InputIter last, ForwardIter res, forward_iterator_tag)
+	{
+		*res = *first;
+		while (++first != last)
+		{
+			if (*res != *first)
+				*++res = *first;
+		}
+		return ++res;
+	}
+
+	//output_iterator版本（只读）
+	template<class InputIter,class OutputIter>
+	OutputIter unique_copy_dispatch(InputIter first, InputIter last, OutputIter res, output_iterator_tag)
+	{
+		auto value = *first;
+		*res = value;
+		while (++first != last)
+		{
+			if (value != *first)
+				*++res = *first;
+		}
+		return ++res;
+	}
+
+	template<class InputIter,class ForwardIter>
+	ForwardIter unique_copy(InputIter first, InputIter last, ForwardIter res)
+	{
+		if (first == last)
+			return res;
+		return unique_copy_dispatch(first, last, res, mystl::iterator_category(res));
+	}
+
+	//forward_iterator版本
+	template<class InputIter, class ForwardIter,class Compare>
+	ForwardIter unique_copy_dispatch(InputIter first, InputIter last, ForwardIter res,Compare comp, forward_iterator_tag)
+	{
+		*res = *first;
+		while (++first != last)
+		{
+			if (!comp( * res, *first))
+				*++res = *first;
+		}
+		return ++res;
+	}
+
+	//output_iterator版本（只读）
+	template<class InputIter, class OutputIter,class Compare>
+	OutputIter unique_copy_dispatch(InputIter first, InputIter last, OutputIter res,Compare comp, output_iterator_tag)
+	{
+		auto value = *first;
+		*res = value;
+		while (++first != last)
+		{
+			if (!comp(value ,*first))
+				*++res = *first;
+		}
+		return ++res;
+	}
+
+	template<class InputIter, class ForwardIter,class Compare>
+	ForwardIter unique_copy(InputIter first, InputIter last, ForwardIter res,Compare comp)
+	{
+		if (first == last)
+			return res;
+		return unique_copy_dispatch(first, last, res, mystl::iterator_category(res),comp);
+	}
+
+	//unique
+	template<class ForwardIter>
+	ForwardIter unique(ForwardIter first, ForwardIter last)
+	{
+		first = mystl::adjacent_find(first, last);
+		return mystl::unique_copy(first, last, first);
+	}
+
+	template<class ForwardIter,class Compare>
+	ForwardIter unique(ForwardIter first, ForwardIter last,Compare comp)
+	{
+		first = mystl::adjacent_find(first, last,comp);
+		return mystl::unique_copy(first, last, first,comp);
+	}
 }
 
 
