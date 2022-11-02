@@ -134,6 +134,7 @@
     <ClInclude Include="algobase.h" />
     <ClInclude Include="allocator.h" />
     <ClInclude Include="construct.h" />
+    <ClInclude Include="exceptiondef.h" />
     <ClInclude Include="functional.h" />
     <ClInclude Include="iterator.h" />
     <ClInclude Include="memory.h" />
