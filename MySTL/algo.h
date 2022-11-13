@@ -12,7 +12,7 @@
 
 #include "algobase.h"
 #include "memory.h"
-
+#include "heap_algo.h"
 #include "functional.h"
 
 namespace mystl
@@ -1830,13 +1830,91 @@ namespace mystl
 	template<class RandomIter>
 	void partial_sort(RandomIter first, RandomIter mid, RandomIter last)
 	{
-		static_assert(false);
+		mystl::make_heap(first, mid);
+		for (auto i = mid; i < last; ++i)
+		{
+			if (*i < *first)
+			{
+				mystl::pop_heap_aux(first, mid, i, *i, distance_type(first));
+			}
+		}
+		mystl::sort_heap(first, mid);
 	}
 
 	template<class RandomIter,class Compare>
 	void partial_sort(RandomIter first, RandomIter mid, RandomIter last, Compare comp)
 	{
+		mystl::make_heap(first, mid, comp);
+		for (auto i = mid; i < last; ++i)
+		{
+			if (comp(*i, *first))
+				mystl::pop_heap_aux(first, mid, i, *i, distance_type(first));
+		}
+		mystl::sort_heap(first, mid);
+	}
 
+	//partial_sort_copy
+	template<class InputIter,class RandomIter,class Distance>
+	RandomIter partial_sort_copy_aux(InputIter first, InputIter last, RandomIter res_first, RandomIter res_last, Distance*)
+	{
+		if (res_first == res_last)
+			return res_last;
+		auto res_iter = res_first;
+		while (first != last && res_iter != res_last)
+		{
+			*res_iter = *first;
+			++first;
+			++res_iter;
+		}
+		mystl::make_heap(res_first, res_iter);
+		while (first != last)
+		{
+			if (*first < *res_first)
+			{
+				mystl::adjust_heap(res_first, static_cast<Distance>(0), res_iter - res_first, *first);
+			}
+			++first;
+		}
+		mystl::sort_heap(res_first, res_iter);
+		return res_iter;
+	}
+
+	template<class InputIter,class RandomIter>
+	RandomIter partial_sort_copy(InputIter first, InputIter last, RandomIter res_first, RandomIter res_last)
+	{
+		return mystl::partial_sort_copy_aux(first, last, res_first, res_last, distance_type(res_first));
+	}
+
+	template<class InputIter, class RandomIter, class Distance,class Compare>
+	RandomIter partial_sort_copy_aux(InputIter first, InputIter last, 
+		RandomIter res_first, RandomIter res_last, Distance*,Compare comp)
+	{
+		if (res_first == res_last)
+			return res_last;
+		auto res_iter = res_first;
+		while (first != last && res_iter != res_last)
+		{
+			*res_iter = *first;
+			++first;
+			++res_iter;
+		}
+		mystl::make_heap(res_first, res_iter,comp);
+		while (first != last)
+		{
+			if (comp( * first, *res_first))
+			{
+				mystl::adjust_heap(res_first, static_cast<Distance>(0), res_iter - res_first, *first,comp);
+			}
+			++first;
+		}
+		mystl::sort_heap(res_first, res_iter,comp);
+		return res_iter;
+	}
+
+	template<class InputIter, class RandomIter,class Compare>
+	RandomIter partial_sort_copy(InputIter first, InputIter last, RandomIter res_first, RandomIter res_last,Compare comp)
+	{
+		return mystl::partial_sort_copy_aux(first, last, res_first, res_last, distance_type(res_first),comp);
 	}
 
 	//partition
