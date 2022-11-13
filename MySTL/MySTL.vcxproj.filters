@@ -56,5 +56,8 @@
     <ClInclude Include="exceptiondef.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="heap_algo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

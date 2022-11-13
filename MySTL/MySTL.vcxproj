@@ -136,6 +136,7 @@
     <ClInclude Include="construct.h" />
     <ClInclude Include="exceptiondef.h" />
     <ClInclude Include="functional.h" />
+    <ClInclude Include="heap_algo.h" />
     <ClInclude Include="iterator.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="type_traits.h" />

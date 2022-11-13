@@ -21,7 +21,7 @@ namespace mystl
 	{
 		typedef Category iterator_category;
 		typedef T value_type;
-		typedef Distance difference_type;
+		typedef Distance distance_type;
 		typedef Pointer pointer;
 		typedef Reference reference;
 	};
@@ -55,7 +55,7 @@ namespace mystl
 		typedef typename Iterator::value_type value_type;
 		typedef typename Iterator::pointer pointer;
 		typedef typename Iterator::reference reference;
-		typedef typename Iterator::difference_type difference_type;
+		typedef typename Iterator::distance_type distance_type;
 	};
 
 	template<class Iterator,bool>
@@ -78,7 +78,7 @@ namespace mystl
 	{
 		typedef random_access_iterator_tag iterator_category;
 		typedef T value_type;
-		typedef ptrdiff_t difference_type;
+		typedef ptrdiff_t distance_type;
 		typedef T* pointer;
 		typedef T& reference;
 	};
@@ -88,7 +88,7 @@ namespace mystl
 	{
 		typedef random_access_iterator_tag iterator_category;
 		typedef T value_type;
-		typedef ptrdiff_t difference_type;
+		typedef ptrdiff_t distance_type;
 		typedef const T* pointer;
 		typedef const T& reference;
 	};
@@ -132,11 +132,11 @@ namespace mystl
 		return Category();
 	}
 
-	//萃取迭代器的difference_type
+	//萃取迭代器的distance_type
 	template<class Iterator>
-	typename iterator_traits<Iterator>::difference_type* difference_type(const Iterator&)
+	typename iterator_traits<Iterator>::distance_type* distance_type(const Iterator&)
 	{
-		return static_cast<typename iterator_traits<Iterator>::difference_type*>(0);
+		return static_cast<typename iterator_traits<Iterator>::distance_type*>(0);
 	}
 
 	//萃取迭代器的value_type
@@ -150,10 +150,10 @@ namespace mystl
 	
 	//input_iterator_tag版本
 	template<class InputIterator>
-	typename iterator_traits<InputIterator>::difference_type 
+	typename iterator_traits<InputIterator>::distance_type 
 		distance_dispatch(InputIterator first, InputIterator last, input_iterator_tag)
 	{
-		typename iterator_traits<InputIterator>::difference_type n = 0;
+		typename iterator_traits<InputIterator>::distance_type n = 0;
 		while (first != last)
 		{
 			++first;
@@ -164,14 +164,14 @@ namespace mystl
 
 	//random_access_iterator_tag版本
 	template<class RandomIterator>
-	typename iterator_traits<RandomIterator>::difference_type
+	typename iterator_traits<RandomIterator>::distance_type
 		distance_dispatch(RandomIterator first, RandomIterator last, random_access_iterator_tag)
 	{
 		return last - first;
 	}
 
 	template<class InputIterator>
-	typename iterator_traits<InputIterator>::difference_type
+	typename iterator_traits<InputIterator>::distance_type
 		distance(InputIterator first, InputIterator last)
 	{
 		distance_dispatch(first, last, iterator_category(first));
@@ -223,7 +223,7 @@ namespace mystl
 	public:
 		typedef typename iterator_traits<Iterator>::iterator_category iterator_category;
 		typedef typename iterator_traits<Iterator>::value_type value_type;
-		typedef typename iterator_traits<Iterator>::difference_type difference_type;
+		typedef typename iterator_traits<Iterator>::distance_type distance_type;
 		typedef typename iterator_traits<Iterator>::pointer pointer;
 		typedef typename iterator_traits<Iterator>::reference reference;
 
@@ -281,29 +281,29 @@ namespace mystl
 			return tmp;
 		}
 
-		self& operator+=(difference_type n)
+		self& operator+=(distance_type n)
 		{
 			current -= n;
 			return *this;
 		}
 
-		self operator+(difference_type n) const
+		self operator+(distance_type n) const
 		{
 			self tmp(current-n);
 		}
 
-		self& operator-=(difference_type n)
+		self& operator-=(distance_type n)
 		{
 			current += n;
 			return *this;
 		}
 
-		self operator-(difference_type n) const
+		self operator-(distance_type n) const
 		{
 			return self(current + n);
 		}
 
-		reference operator[](difference_type n) const
+		reference operator[](distance_type n) const
 		{
 			return *(*this + n);
 		}
@@ -311,7 +311,7 @@ namespace mystl
 
 	//重载operator-
 	template<class Iterator>
-	typename reverse_iterator<Iterator>::difference_type
+	typename reverse_iterator<Iterator>::distance_type
 		operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
 	{
 		return rhs.base() - lhs.base();
