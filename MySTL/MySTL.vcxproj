@@ -139,10 +139,12 @@
     <ClInclude Include="heap_algo.h" />
     <ClInclude Include="iterator.h" />
     <ClInclude Include="memory.h" />
+    <ClInclude Include="test.h" />
     <ClInclude Include="type_traits.h" />
     <ClInclude Include="uninitialized.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="vector.h" />
+    <ClInclude Include="vector_test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
