@@ -18,7 +18,7 @@ namespace mystl
 				mystl::vector<int> v1;
 				mystl::vector<int> v2(10);
 				mystl::vector<int> v3(10, 1);
-				//mystl::vector<int> v4(a, a + 5);
+				mystl::vector<int> v4(a, a + 5);
 				mystl::vector<int> v5(v2);
 				mystl::vector<int> v6(std::move(v2));
 				mystl::vector<int> v7{ 1,2,3,4,5,6,7,8,9 };
@@ -28,18 +28,18 @@ namespace mystl
 				v10 = { 1,2,3,4,5,6,7,8,9 };
 
 				FUN_AFTER(v1, v1.assign(8, 8));
-				//FUN_AFTER(v1, v1.assign(a, a + 5));
+				FUN_AFTER(v1, v1.assign(a, a + 5));
 				FUN_AFTER(v1, v1.emplace(v1.begin(), 0));
 				FUN_AFTER(v1, v1.emplace_back(6));
 				FUN_AFTER(v1, v1.push_back(6));
 				FUN_AFTER(v1, v1.insert(v1.end(), 7));
 				FUN_AFTER(v1, v1.insert(v1.begin() + 3, 2, 3));
-				//FUN_AFTER(v1, v1.insert(v1.begin(), a, a + 5));
+				FUN_AFTER(v1, v1.insert(v1.begin(), a, a + 5));
 				FUN_AFTER(v1, v1.pop_back());
 				FUN_AFTER(v1, v1.erase(v1.begin()));
 				FUN_AFTER(v1, v1.erase(v1.begin(), v1.begin() + 2));
 				FUN_AFTER(v1, v1.reverse());
-				//FUN_AFTER(v1, v1.swap(v4));
+				FUN_AFTER(v1, v1.swap(v4));
 				FUN_VALUE(*v1.begin());
 				FUN_VALUE(*(v1.end() - 1));
 				FUN_VALUE(*v1.rbegin());

@@ -82,12 +82,13 @@ namespace mystl
 
 		//explicit constructor 显式构造
 		template<class Ty1=T1,class Ty2=T2,
-			typename=typename std::enable_if<
+			typename std::enable_if<
 			std::is_copy_constructible<Ty1>::value&&
 			std::is_copy_constructible<Ty2>::value&&
 			!(std::is_convertible<const Ty1&, T1>::value&&
 			std::is_convertible<const Ty2&, T2>::value)>::type>
 		explicit constexpr pair(const Ty1& a, const Ty2& b) :first(a), second(b) {};
+
 
 		//default constructor 默认构造函数
 		pair(const pair& rhs) = default;
@@ -105,7 +106,7 @@ namespace mystl
 
 		//explicit constructor for other type
 		template<class Other1, class Other2,
-			typename = typename std::enable_if<
+			typename std::enable_if<
 			std::is_constructible<T1,Other1>::value&&
 			std::is_constructible<T2,Other2>::value&&
 			!(std::is_convertible<Other1&&, T1>::value&&
@@ -127,7 +128,7 @@ namespace mystl
 		//explicit constructor for other pair 
 		//lvalue ref
 		template<class Other1, class Other2,
-			typename = typename std::enable_if<
+			typename  std::enable_if<
 			std::is_constructible<T1, const Other1&>::value&&
 			std::is_constructible<T2, const Other2&>::value &&
 			!(std::is_convertible<const Other1&, T1>::value&&
@@ -149,7 +150,7 @@ namespace mystl
 		//explicit constructor for other pair 
 		//rvalue ref
 		template<class Other1, class Other2,
-			typename = typename std::enable_if<
+			typename  std::enable_if<
 			std::is_constructible<T1, Other1>::value&&
 			std::is_constructible<T2, Other2>::value &&
 			!(std::is_convertible<Other1, T1>::value&&

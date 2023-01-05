@@ -1,13 +1,34 @@
 ﻿// MySTL.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include <iostream>
+#ifdef _MSC_VER
+#define _SCL_SECURE_NO_WARNINGS
+#endif
+
+#if defined(_MSC_VER) && defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC 
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif // check memory leaks
+
+#include "vector_test.h"
+
 int main()
 {
+	using namespace mystl::test;
 
-    std::cout << "Hello World!\n"; 
+	std::cout.sync_with_stdio(false);
+
+	RUN_ALL_TEST();
+
+	vector_test::vector_test();
+
+#if defined(_MSC_VER)||defined(_DEBUG)
+	_CrtDumpMemoryLeaks();
+#endif
+
+	system("pause");
 }
-
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
 // 调试程序: F5 或调试 >“开始调试”菜单
 

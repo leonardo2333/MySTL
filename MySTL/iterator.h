@@ -174,7 +174,7 @@ namespace mystl
 	typename iterator_traits<InputIterator>::distance_type
 		distance(InputIterator first, InputIterator last)
 	{
-		distance_dispatch(first, last, iterator_category(first));
+		return distance_dispatch(first, last, iterator_category(first));
 	}
 
 	//以下函数用于让迭代器前进n

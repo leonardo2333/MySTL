@@ -50,7 +50,7 @@ namespace mystl
 	template<class Iterator1,class Iterator2>
 	void iter_swap(Iterator1 lhs, Iterator2 rhs)
 	{
-		mystl::swap(lhs, rhs);
+		mystl::swap(*lhs, *rhs);
 	}
 
 	//copy
@@ -119,7 +119,7 @@ namespace mystl
 	//random_access_iterator版本
 	template<class RandomIter1,class RandomIter2>
 	RandomIter2 unchecked_copy_backward_cat(RandomIter1 first, RandomIter1 last,
-		RandomIter2 resullt, random_access_iterator_tag)
+		RandomIter2 result, random_access_iterator_tag)
 	{
 		for(auto n=last-first;n>0;--n)
 		{
@@ -136,18 +136,18 @@ namespace mystl
 	}
 
 	//trivially_copy_assignable类型的特化版本
-	template<class BidirectionalIter1,class BidirectionalIter2>
+	template<class Tp,class Up>
 	typename std::enable_if<
 		std::is_same<
-		typename std::remove_const<BidirectionalIter1>::type,BidirectionalIter2>::value&&
-		std::is_trivially_copy_assignable<BidirectionalIter1>::value,BidirectionalIter2*>::type
-		unchecked_copy_backward(BidirectionalIter1 first, BidirectionalIter1 last, BidirectionalIter2 result)
+		typename std::remove_const<Tp>::type,Up>::value&&
+		std::is_trivially_copy_assignable<Tp>::value,Up*>::type
+		unchecked_copy_backward(Tp* first, Tp* last, Up* result)
 	{
-		const auto n = static_cast<BidirectionalIter1>(last - first);
+		const auto n = static_cast<Tp>(last - first);
 		if (n)
 		{
 			result -= n;
-			memmove(result, first, n * sizeof(BidirectionalIter2));
+			memmove(result, first, n * sizeof(Up));
 		}
 		return result;
 	}
@@ -265,7 +265,7 @@ namespace mystl
 	//random_access_iterator版本
 	template<class RandomIter1, class RandomIter2>
 	RandomIter2 unchecked_move_backward_cat(RandomIter1 first, RandomIter1 last,
-		RandomIter2 resullt, random_access_iterator_tag)
+		RandomIter2 result, random_access_iterator_tag)
 	{
 		for (auto n = last - first; n > 0; --n)
 		{
@@ -282,18 +282,17 @@ namespace mystl
 	}
 
 	//trivially_move_assignable类型的特化版本
-	template<class BidirectionalIter1, class BidirectionalIter2>
+	template<class Tp, class Up>
 	typename std::enable_if<
-		std::is_same<
-		typename std::remove_const<BidirectionalIter1>::type, BidirectionalIter2>::value&&
-		std::is_trivially_move_assignable<BidirectionalIter1>::value, BidirectionalIter2*>::type
-		unchecked_move_backward(BidirectionalIter1 first, BidirectionalIter1 last, BidirectionalIter2 result)
+		std::is_same<typename std::remove_const<Tp>::type, Up>::value&&
+		std::is_trivially_move_assignable<Tp>::value, Up*>::type
+		unchecked_move_backward(Tp* first, Tp* last, Up* result)
 	{
-		const auto n = static_cast<BidirectionalIter1>(last - first);
+		const auto n = static_cast<Tp>(last - first);
 		if (n)
 		{
 			result -= n;
-			memmove(result, first, n * sizeof(BidirectionalIter2));
+			memmove(result, first, n * sizeof(Up));
 		}
 		return result;
 	}
@@ -406,7 +405,7 @@ namespace mystl
 	{
 		for (; first1 != last1 && first2 != last2; ++first1, ++first2)
 		{
-			if (comp(*first1,*first2)
+			if (comp(*first1,*first2))
 				return true;
 			else if (comp(*first2,*first1))
 				return false;

@@ -231,7 +231,7 @@ namespace mystl
 
 	//投射函数：返回第二参数
 	template<class Arg1, class Arg2>
-	struct projectfirst :public binary_function<Arg1, Arg2, Arg2>
+	struct projectsecond :public binary_function<Arg1, Arg2, Arg2>
 	{
 		Arg2 operator()(const Arg1&, const Arg2& rhs) const
 		{

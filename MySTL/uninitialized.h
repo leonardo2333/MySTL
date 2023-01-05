@@ -202,7 +202,7 @@ namespace mystl
 	template<class InputIter, class Size,class ForwardIter>
 	ForwardIter unchecked_uninit_move_n(InputIter first, Size n, ForwardIter result, std::true_type)
 	{
-		return mystl::move_n(first, n, result);
+		return mystl::move(first, n, result);
 	}
 
 	template<class InputIter, class Size,class ForwardIter>

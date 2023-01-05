@@ -434,7 +434,7 @@ LOG_GREEN(" EXPECT_PTR_NE succeeded!\n");						  \
 		*/
 
 #define EXPECT_CON_EQ(c1,c2) 												 \
-auto first1 = std::begin(c1), last1 = std::end(c1);							 \
+{auto first1 = std::begin(c1), last1 = std::end(c1);							 \
 auto first2 = std::begin(c2), last2 = std::end(c2);							 \
 while (first1 != last1 && first2 != last2 && *first1 == *first2)			 \
 {																			 \
@@ -453,10 +453,10 @@ else																		 \
 	LOG_RED(" EXPECT_CON_EQ failed!\n");									 \
 	LOG_RED(" Expect:" << *first1 << "\n");									 \
 	LOG_RED(" Actual:" << *first2 << "\n");									 \
-}
+}}
 
 #define EXPECT_CON_NE(c1,c2) 												 \
-auto first1 = std::begin(c1), last1 = std::end(c1);							 \
+{auto first1 = std::begin(c1), last1 = std::end(c1);							 \
 auto first2 = std::begin(c2), last2 = std::end(c2);							 \
 while (first1 != last1 && first2 != last2 && *first1 == *first2)			 \
 {																			 \
@@ -473,7 +473,7 @@ else																		 \
 	UnitTest::GetInstance()->CurTestCase->TestResult = 0;					 \
 	UnitTest::GetInstance()->CurTestCase->nFailed++;						 \
 	LOG_RED(" EXPECT_CON_NE failed!\n");									 \
-}
+}}
 
 
 		/*****************************************************************************************/
@@ -519,21 +519,21 @@ std::cout << str_name << ":" << str << std::endl;
 
 // 输出容器调用函数后的结果
 #define FUN_AFTER(container,func)					 \
-std::string func_name = #func;						 \
+{std::string func_name = #func;						 \
 std::cout << " After " << func_name << ":";			 \
 func;												 \
-COUT(container);
+COUT(container);}
 
 #define STR_FUN_AFTER(str,func)						 \
-std::string func_name = #func;						 \
+{std::string func_name = #func;						 \
 std::cout << " After " << func_name << ":";			 \
 func;												 \
-STR_COUT(str);
+STR_COUT(str);}
 
 // 输出容器调用函数的值
 #define FUN_VALUE(func)								  \
-std::string func_name = #func;						  \
-std::cout << func_name << ":" << func << std::endl;
+{std::string func_name = #func;						  \
+std::cout << func_name << ":" << func << std::endl;}
 
 		// 输出测试数量级
 		void test_len(size_t len1, size_t len2, size_t len3, size_t wide)
@@ -554,7 +554,7 @@ std::cout << func_name << ":" << func << std::endl;
 
 		// 常用测试性能的宏
 #define FUN_TEST_FORMAT1(mode,fun,arg,count)													  \
-std::srand((int)time(0));																		  \
+{std::srand((int)time(0));																		  \
 clock_t start, end;																				  \
 mode c;																							  \
 char buf[10];																					  \
@@ -568,10 +568,10 @@ int n =static_cast<int>(static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000
 std::snprintf(buf, sizeof(buf), "%d", n);														  \
 std::string t = buf;																			  \
 t += "ms    |";																					  \
-std::cout << std::setw(WIDE) << t;
+std::cout << std::setw(WIDE) << t;}
 
 #define FUN_TEST_FORMAT2(mode, fun, arg1, arg2, count) 											 \
-srand((int)time(0));																			 \
+{srand((int)time(0));																			 \
 clock_t start, end;																				 \
 mode c;																							 \
 char buf[10];																					 \
@@ -584,10 +584,10 @@ int n = static_cast<int>(static_cast<double>(end - start)										 \
 std::snprintf(buf, sizeof(buf), "%d", n);														 \
 std::string t = buf;																			 \
 t += "ms    |";																					 \
-std::cout << std::setw(WIDE) << t;
+std::cout << std::setw(WIDE) << t;}
 
 #define LIST_SORT_DO_TEST(mode,count)							 \
-srand((int)time(0));											 \
+{srand((int)time(0));											 \
 clock_t start, end;												 \
 mode::list<int> l;												 \
 char buf[10];													 \
@@ -603,10 +603,10 @@ int n = static_cast<int>(static_cast<double>(end - start)		 \
 std::snprintf(buf, sizeof(buf), "%d", n);						 \
 std::string t = buf;											 \
 t += "ms    |";													 \
-std::cout << std::setw(WIDE) << t;
+std::cout << std::setw(WIDE) << t;}
 
 #define MAP_EMPLACE_DO_TEST(mode, con, count)	        		 \
-srand((int)time(0));											 \
+{srand((int)time(0));											 \
 clock_t start, end;												 \
 mode::con<int, int> c;											 \
 char buf[10];													 \
@@ -619,7 +619,7 @@ int n = static_cast<int>(static_cast<double>(end - start)		 \
 std::snprintf(buf, sizeof(buf), "%d", n);						 \
 std::string t = buf;											 \
 t += "ms    |";													 \
-std::cout << std::setw(WIDE) << t;
+std::cout << std::setw(WIDE) << t;}
 
 		// 重构重复代码
 #define CON_TEST_P1(con, fun, arg, len1, len2, len3)			\

@@ -240,7 +240,7 @@ namespace mystl
 			auto m = n - 1;
 			auto cur = first;
 			++cur;
-			while (cur != last && m != 0 && comp(*cur,value)
+			while (cur != last && m != 0 && comp(*cur,value))
 			{
 				++cur;
 				--m;
@@ -382,7 +382,7 @@ namespace mystl
 		{
 			for (auto cur = first2; cur != last2; ++cur)
 			{
-				if (comp(*cur,*first1)
+				if (comp(*cur,*first1))
 					return first1;
 			}
 		}
@@ -992,7 +992,7 @@ namespace mystl
 	template<class InputIter1,class InputIter2, class OutputIter, class BinaryOperation>
 	OutputIter transform(InputIter1 first1, InputIter1 last1,InputIter2 first2, OutputIter res, BinaryOperation binary_op)
 	{
-		while (first != last)
+		while (first1 != last1)
 		{
 			*res = binary_op(*first1, *first2);
 			++first1;
@@ -1372,7 +1372,7 @@ namespace mystl
 				if (c2 == 0)
 					return false;
 				auto c1 = 1;
-				j = i;
+				auto j = i;
 				for (++j; j != last1; ++j)
 				{
 					if (binary_op(*i, *j))
@@ -1976,7 +1976,7 @@ namespace mystl
 		Size res = 0;
 		while (n > 1)
 		{
-			n >> =1;
+			n >>=1;
 			++res;
 		}
 		return res;
@@ -2228,7 +2228,7 @@ namespace mystl
 		while (last - first > 3)
 		{
 			auto cut = mystl::unchecked_partition(first, last, 
-				mystl::median(*first, *(last - 1), *(first + (last - first) / 2));
+				mystl::median(*first, *(last - 1), *(first + (last - first) / 2)));
 			if (cut <= nth)
 				first = cut;
 			else
@@ -2245,7 +2245,7 @@ namespace mystl
 		while (last - first > 3)
 		{
 			auto cut = mystl::unchecked_partition(first, last,
-				mystl::median(*first, *(last - 1), *(first + (last - first) / 2),comp);
+				mystl::median(*first, *(last - 1), *(first + (last - first) / 2), comp));
 			if (cut <= nth)
 				first = cut;
 			else

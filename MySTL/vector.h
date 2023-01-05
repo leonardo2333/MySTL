@@ -71,7 +71,7 @@ namespace mystl
 			fill_init(n, value);
 		}
 
-		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value>::type>
+		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value,int>::type=0>
 		vector(Iter first, Iter last)
 		{
 			MYSTL_DEBUG(!(last < first));
@@ -96,12 +96,12 @@ namespace mystl
 		}
 
 		vector& operator=(const vector& rhs);
-		vector& operator=(vector&& rhs);
+		vector& operator=(vector&& rhs)noexcept;
 		vector& operator=(std::initializer_list<value_type> ilist)
 		{
-			vector tmp(ilist.begin(), ilist.end());
+			vector<value_type> tmp(ilist);
 			swap(tmp);
-			return this;
+			return *this;
 		}
 
 		~vector()
@@ -115,7 +115,7 @@ namespace mystl
 		{
 			return begin_;
 		}
-		const_iterator begin()noexcept
+		const_iterator begin()const noexcept
 		{
 			return begin_;
 		}
@@ -123,7 +123,7 @@ namespace mystl
 		{
 			return end_;
 		}
-		const_iterator end()noexcept
+		const_iterator end()const noexcept
 		{
 			return end_;
 		}
@@ -205,7 +205,7 @@ namespace mystl
 			return (*this)[n];
 		}
 
-		const_reference at(size_type n)
+		const_reference at(size_type n) const 
 		{
 			THROW_OUT_OF_RANGE_IF(!(n < size()), "vector<T>::at() subscript out of range");
 			return (*this)[n];
@@ -217,7 +217,7 @@ namespace mystl
 			return *begin_;
 		}
 		
-		const_reference front()
+		const_reference front()const
 		{
 			MYSTL_DEBUG(!empty());
 			return *begin_;
@@ -229,7 +229,7 @@ namespace mystl
 			return *(end_ - 1);
 		}
 
-		const_reference back()
+		const_reference back()const
 		{
 			MYSTL_DEBUG(!empty());
 			return *(end_ - 1);
@@ -252,7 +252,7 @@ namespace mystl
 			fill_assign(n, value);
 		}
 
-		template<class Iter, typename std::enable_if<mystl::is_input_iterator<Iter>::value>::type >
+		template<class Iter, typename std::enable_if<mystl::is_input_iterator<Iter>::value,int>::type=0 >
 		void assign(Iter first, Iter last)
 		{
 			MYSTL_DEBUG(!(last < first));
@@ -291,7 +291,7 @@ namespace mystl
 			MYSTL_DEBUG(pos >= begin_ && pos <= end_);
 			return fill_insert(const_cast<iterator>(pos), n, value);
 		}
-		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value>::type>
+		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value,int>::type=0>
 		void insert(const_iterator pos, Iter first, Iter last)
 		{
 			MYSTL_DEBUG(pos >= begin_ && pos <= end_ && !(last < first));
@@ -369,7 +369,7 @@ namespace mystl
 			{
 				auto i = mystl::copy(rhs.begin(), rhs.end(), begin());
 				data_allocator::destroy(i, end());
-				end() = begin() + len;
+				end_ = begin() + len;
 			}
 			else
 			{
@@ -382,9 +382,9 @@ namespace mystl
 	}
 
 	template<class T>
-	vector<T>& vector<T>::operator=(vector&& rhs)noexcept
+	vector<T>& vector<T>::operator=(vector&& rhs) noexcept
 	{
-		destroy_and_recover(begin(), end(), capacity() - begin());
+		destroy_and_recover(begin_, end_, cap_ - begin_);
 		begin_ = rhs.begin_;
 		end_ = rhs.end_;
 		cap_ = rhs.cap_;
@@ -431,6 +431,7 @@ namespace mystl
 		if (end_ != cap_ && xpos == end_)
 		{
 			data_allocator::construct(mystl::address_of(*end_), mystl::forward<Args>(args)...);
+			++end_;
 			//为什么需要address_of()，而不是直接用end_
 		}
 		else if (end_ != cap_)
@@ -439,7 +440,7 @@ namespace mystl
 			data_allocator::construct(mystl::address_of(*end_), *(end_ - 1));
 			++new_end;
 			mystl::copy_backward(xpos, end_ - 1, end_);
-			*xpos = value_type(mystl::forward<Args>(arg)...);
+			*xpos = value_type(mystl::forward<Args>(args)...);
 			end_ = new_end;
 		}
 		else
@@ -532,8 +533,8 @@ namespace mystl
 	{
 		MYSTL_DEBUG(first >= begin() && last <= end() && first < last);
 		const auto n = first - begin();
-		iterator xpos = const_cast<iterator>(first);
-		data_allocator::destroy(mystl::move(r + (last - first), end_, r), end_);
+		iterator xpos = begin_+n;
+		data_allocator::destroy(mystl::move(xpos + (last - first), end_, xpos), end_);
 		end_ = end_ - (last - first);
 		return begin_ + n;
 	}
@@ -554,7 +555,7 @@ namespace mystl
 	template<class T>
 	void vector<T>::swap(vector<T>& rhs)noexcept
 	{
-		if (this != rhs)
+		if (*this != rhs)
 		{
 			mystl::swap(begin_, rhs.begin_);
 			mystl::swap(end_, rhs.end_);
@@ -617,11 +618,11 @@ namespace mystl
 	inline void vector<T>::destroy_and_recover(iterator first, iterator last, size_type n)
 	{
 		data_allocator::destroy(first, last);
-		data_allocator::reallocate(first, n);
+		data_allocator::deallocate(first, n);
 	}
 	
 	template<typename T>
-	inline vector<T>::size_type vector<T>::get_new_cap(size_type add_size)
+	inline typename vector<T>::size_type vector<T>::get_new_cap(size_type add_size)
 	{
 		const auto old_size = capacity();
 		THROW_LENGTH_ERROR_IF(old_size > max_size() - add_size, "vector<T>'s size too big");
@@ -630,13 +631,13 @@ namespace mystl
 			return old_size + add_size > max_size() - 16 ? old_size + add_size : old_size + add_size + 16;
 		}
 		return old_size == 0 ? mystl::max(add_size, static_cast<size_type>(16)) :
-			mystl::max(old_size + old_size >> 1, old_size + add_size);
+			mystl::max(old_size + (old_size >> 1), old_size + add_size);
 	}
 
 	template<typename T>
 	inline void vector<T>::fill_assign(size_type n, const value_type& value)
 	{
-		if (n > cap_)
+		if (n > capacity())
 		{
 			vector<T> tmp(n, value);
 			swap(tmp);
@@ -706,7 +707,7 @@ namespace mystl
 		try
 		{
 			new_end = mystl::uninitialized_move(begin_, pos, new_begin);
-			data_allocator::construct(mystl::address_of(*new_end), mystl::forward<Atgs>(args)...);
+			data_allocator::construct(mystl::address_of(*new_end), mystl::forward<Args>(args)...);
 			++new_end;
 			new_end = mystl::uninitialized_move(pos, end_, new_end);
 		}
@@ -747,13 +748,13 @@ namespace mystl
 	}
 
 	template<typename T>
-	inline vector<T>::iterator vector<T>::fill_insert(iterator pos, size_type n, const value_type& value)
+	inline typename vector<T>::iterator vector<T>::fill_insert(iterator pos, size_type n, const value_type& value)
 	{
 		if (!n)
 			return pos;
 		const size_type xpos = pos - begin_;
 		const value_type value_copy = value;
-		if (static_cast<size_type>(cap_ - size()) >= n)
+		if (static_cast<size_type>(capacity() - size()) >= n)
 		{
 			const size_type after_elems = end_ - pos;
 			auto old_end = end_;
@@ -784,7 +785,7 @@ namespace mystl
 			}
 			catch (...)
 			{
-				destroy_and_recover(new_begin,new_size);
+				destroy_and_recover(new_begin,new_end,new_size);
 				throw;
 			}
 			data_allocator::deallocate(begin_, cap_ - begin_);
@@ -866,7 +867,7 @@ namespace mystl
 	template<class T>
 	bool operator==(const vector<T>& lhs, const vector<T>& rhs)
 	{
-		return lhs.size() == rhs.size && mystl::equal(lhs.begin(), lhs.end(), rhs.begin());
+		return lhs.size() == rhs.size() && mystl::equal(lhs.begin(), lhs.end(), rhs.begin());
 	}
 
 	template<class T>

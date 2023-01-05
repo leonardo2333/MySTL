@@ -137,7 +137,7 @@ namespace mystl
 	template<class RandomIter, class Compare>
 	void pop_heap(RandomIter first, RandomIter last,Compare comp)
 	{
-		mystl::pop_heap_aux(first, last - 1, last - 1, *(last - 1), distance_type(first),Compare comp);
+		mystl::pop_heap_aux(first, last - 1, last - 1, *(last - 1), distance_type(first),comp);
 	}
 
 	//sort_heap
