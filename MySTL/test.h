@@ -106,17 +106,17 @@ namespace mystl
 
 #define TESTCASE_NAME(testcase_name) testcase_name##_TEST
 
-#define MYSTL_TEST(testcase_name) \
-class TESTCASE_NAME(testcase_name):public TestCase\
-{\
-private:\
-	static TestCase* const testcase;\
-public:\
-	TESTCASE_NAME(testcase_name)(const char* case_name): TestCase(case_name) {};\
-    virtual void Run();\
-}\
-TestCase* const TESTCASE_NAME(testcase_name)::testcase=\
-UnitTest::GetInstance()->RegisterTestCase(new TESTCASE_NAME(testcase_name)(#testcase_name));\
+#define MYSTL_TEST(testcase_name)																		\
+class TESTCASE_NAME(testcase_name):public TestCase														\
+{																										\
+private:																								\
+	static TestCase* const testcase;																	\
+public:																									\
+	TESTCASE_NAME(testcase_name)(const char* case_name): TestCase(case_name) {};						\
+    virtual void Run();																					\
+}																										\
+TestCase* const TESTCASE_NAME(testcase_name)::testcase=													\
+UnitTest::GetInstance()->RegisterTestCase(new TESTCASE_NAME(testcase_name)(#testcase_name));			\
 void TESTCASE_NAME(testcase_name)::Run()
 
 		/*
@@ -666,7 +666,7 @@ std::cout << std::setw(WIDE) << t;}
 	LIST_SORT_DO_TEST(mystl, len2);                            \
 	LIST_SORT_DO_TEST(mystl, len3);
 
-#define TEST(testcase_name) MYSTL_TEST(testcase)
+#define TEST(testcase_name) MYSTL_TEST(testcase_name)
 
 #define RUN_ALL_TEST() mystl::test::UnitTest::GetInstance()->Run()
 

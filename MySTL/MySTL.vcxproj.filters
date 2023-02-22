@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{ecf93f35-6a95-4b4b-8d16-11b28f323600}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MySTL.cpp">
@@ -59,11 +62,26 @@
     <ClInclude Include="heap_algo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="test.h">
+    <ClInclude Include="algorithm.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="algo_performance_test.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
+      <Filter>Test</Filter>
     </ClInclude>
     <ClInclude Include="vector_test.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="algo_test.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="deque.h">
       <Filter>头文件</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
