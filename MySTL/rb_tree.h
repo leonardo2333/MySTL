@@ -1020,7 +1020,7 @@ namespace mystl
 		}
 		else if (hint == end())
 		{
-			if (!key_comp_(key, value_traits::get_key(rightmost()->get_node_ptr->value)))
+			if (!key_comp_(key, value_traits::get_key(rightmost()->get_node_ptr()->value)))
 			{
 				return insert_node_at(hint.node, np, false);
 			}
@@ -1063,7 +1063,7 @@ namespace mystl
 		}
 		else if (hint == end())
 		{
-			if (key_comp_(value_traits::get_key(rightmost()->get_node_ptr->value), key))
+			if (key_comp_(value_traits::get_key(rightmost()->get_node_ptr()->value), key))
 			{
 				return insert_node_at(rightmost(), np, false);
 			}

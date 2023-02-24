@@ -264,33 +264,33 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 	public:
 		deque()
 		{
-			//to be finished;
+			fill_init(0, value_type());
 		}
 
 		explicit deque(size_type n)
 		{
-
+			fill_init(n, value_type());
 		}
 
 		deque(size_type n,const value_type& v)
 		{
-
+			fill_init(n, v);
 		}
 
 		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value>::type>
 		deque(Iter first, Iter last)
 		{
-			
+			copy_init(first, last, iterator_category(first));
 		}
 
 		deque(std::initializer_list<value_type> ilist)
 		{
-
+			copy_init(ilist.begin(), ilist.end(), forward_iterator_tag{});
 		}
 
 		deque(const deque& rhs)
 		{
-
+			copy_init(rhs.begin(), rhs.end(), forward_iterator_tag{});
 		}
 
 		deque(deque&& rhs)noexcept
