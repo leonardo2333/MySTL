@@ -144,6 +144,7 @@
     <ClInclude Include="iterator.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="rb_tree.h" />
+    <ClInclude Include="set.h" />
     <ClInclude Include="test.h" />
     <ClInclude Include="type_traits.h" />
     <ClInclude Include="uninitialized.h" />
