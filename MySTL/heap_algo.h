@@ -33,7 +33,7 @@ namespace mystl
 	template<class RandomIter>
 	void push_heap(RandomIter first, RandomIter last)
 	{
-		mystl::push_heap_d(first, last, distance_type(first));
+		mystl::push_heap_d(first, last, difference_type(first));
 	}
 
 	template<class RandomIter, class Distance, class T,class Compare>
@@ -59,7 +59,7 @@ namespace mystl
 	template<class RandomIter, class Compare>
 	void push_heap(RandomIter first, RandomIter last,Compare comp)
 	{
-		mystl::push_heap_d(first, last, distance_type(first),comp);
+		mystl::push_heap_d(first, last, difference_type(first),comp);
 	}
 
 	//pop_heap
@@ -99,7 +99,7 @@ namespace mystl
 	template<class RandomIter>
 	void pop_heap(RandomIter first, RandomIter last)
 	{
-		mystl::pop_heap_aux(first, last - 1, last - 1, *(last - 1), distance_type(first));
+		mystl::pop_heap_aux(first, last - 1, last - 1, *(last - 1), difference_type(first));
 	}
 
 	template<class RandomIter, class T, class Distance, class Compare>
@@ -137,7 +137,7 @@ namespace mystl
 	template<class RandomIter, class Compare>
 	void pop_heap(RandomIter first, RandomIter last,Compare comp)
 	{
-		mystl::pop_heap_aux(first, last - 1, last - 1, *(last - 1), distance_type(first),comp);
+		mystl::pop_heap_aux(first, last - 1, last - 1, *(last - 1), difference_type(first),comp);
 	}
 
 	//sort_heap
@@ -181,7 +181,7 @@ namespace mystl
 	template<class RandomIter>
 	void make_heap(RandomIter first, RandomIter last)
 	{
-		mystl::make_heap_aux(first, last, distance_type(first));
+		mystl::make_heap_aux(first, last, difference_type(first));
 	}
 
 	template<class RandomIter, class Distance,class Compare>
@@ -205,7 +205,7 @@ namespace mystl
 	template<class RandomIter,class Compare>
 	void make_heap(RandomIter first, RandomIter last,Compare comp)
 	{
-		mystl::make_heap_aux(first, last, distance_type(first),comp);
+		mystl::make_heap_aux(first, last, difference_type(first),comp);
 	}
 }
 

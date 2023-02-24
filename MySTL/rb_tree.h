@@ -28,7 +28,7 @@ namespace mystl
 	template<class T,bool>
 	struct rb_tree_value_traits_imp
 	{
-		typedef T key_value;
+		typedef T key_type;
 		typedef T mapped_type;
 		typedef T value_type;
 
@@ -218,7 +218,7 @@ namespace mystl
 			else
 			{
 				auto fa = node->parent;
-				while (node = fa->left)
+				while (node == fa->left)
 				{
 					node = fa;
 					fa = node->parent;
@@ -249,10 +249,10 @@ namespace mystl
 		using rb_tree_iterator_base<T>::node;
 
 		rb_tree_iterator(){}
-		rb_tree_iterator(base_ptr p):node(p){}
-		rb_tree_iterator(node_ptr p):node(p){}
-		rb_tree_iterator(const iterator& rhs):node(rhs.node){}
-		rb_tree_iterator(const const_iterator& rhs):node(rhs.node){}
+		rb_tree_iterator(base_ptr p) { node = p; }
+		rb_tree_iterator(node_ptr p) { node = p; }
+		rb_tree_iterator(const iterator& rhs) { node = rhs.node; }
+		rb_tree_iterator(const const_iterator& rhs) { node = rhs.node; }
 
 		ref operator*() const { return node->get_node_ptr()->value; }
 		ptr operator->()const { return &(operator*()); }
@@ -302,10 +302,10 @@ namespace mystl
 		using rb_tree_iterator_base<T>::node;
 
 		rb_tree_const_iterator() {}
-		rb_tree_const_iterator(base_ptr p) :node(p) {}
-		rb_tree_const_iterator(node_ptr p) :node(p) {}
-		rb_tree_const_iterator(const iterator& rhs) :node(rhs.node) {}
-		rb_tree_const_iterator(const const_iterator& rhs) :node(rhs.node) {}
+		rb_tree_const_iterator(base_ptr p) { node = p; }
+		rb_tree_const_iterator(node_ptr p) { node = p; }
+		rb_tree_const_iterator(const iterator& rhs) { node=rhs.node; }
+		rb_tree_const_iterator(const const_iterator& rhs) {	node = rhs.node;}
 
 		ref operator*() const { return node->get_node_ptr()->value; }
 		ptr operator->()const { return &(operator*()); }
@@ -542,7 +542,7 @@ namespace mystl
 		//x为y的独子或者nil
 		auto x = (y->left!=nullptr ? y->left : y->right);
 		//xp为x的父节点
-		auto xp = nullptr;
+		NodePtr xp = nullptr;
 
 
 		// y != z 说明 z 有两个非空子节点，此时 y 指向 z 右子树的最左节点，x 指向 y 的右子节点。
@@ -628,13 +628,49 @@ namespace mystl
 					{
 						if (brother->right == nullptr || rb_tree_is_black(brother->right))
 						{//case 3
+							if (brother->left != nullptr)
+								rb_tree_set_black(brother->right);
+							rb_tree_set_red(brother);
+							rb_tree_rotate_right(brother, root);
+							brother = xp->right;
+						}
+						//case 4
+						brother->color = xp->color;
+						rb_tree_set_black(xp);
+						if (brother->right != nullptr)
+							rb_tree_set_black(brother->right);
+						rb_tree_rotate_left(xp, root);
+						break;
+					}
+				}
+				else
+				{
+					auto brother = xp->left;
+					if (rb_tree_is_red(brother))
+					{ // case 1
+						rb_tree_set_black(brother);
+						rb_tree_set_red(xp);
+						rb_tree_rotate_right(xp, root);
+						brother = xp->left;
+					}
+					if ((brother->left == nullptr || !rb_tree_is_red(brother->left)) &&
+						(brother->right == nullptr || !rb_tree_is_red(brother->right)))
+					{ // case 2
+						rb_tree_set_red(brother);
+						x = xp;
+						xp = xp->parent;
+					}
+					else
+					{
+						if (brother->left == nullptr || !rb_tree_is_red(brother->left))
+						{ // case 3
 							if (brother->right != nullptr)
 								rb_tree_set_black(brother->right);
 							rb_tree_set_red(brother);
 							rb_tree_rotate_left(brother, root);
 							brother = xp->left;
 						}
-						//case 4
+						// 转为 case 4
 						brother->color = xp->color;
 						rb_tree_set_black(xp);
 						if (brother->left != nullptr)
@@ -846,7 +882,7 @@ namespace mystl
 		size_type count_multi(const key_type& key)const
 		{
 			auto p = equal_range_multi(key);
-			return static_cast<size_type>(mystl::distance(p.first, p.end));
+			return static_cast<size_type>(mystl::distance(p.first, p.second));
 		}
 
 		size_type count_unique(const key_type& key)const
@@ -874,7 +910,7 @@ namespace mystl
 		{
 			auto it = find(key);
 			auto next = it;
-			return it == end() ? make_pair<iterator, iterator>(it, it) : make_pair<iterator, iterator>(it, ++next);
+			return it == end() ? make_pair(it, it) : make_pair(it, ++next);
 		}
 		
 		mystl::pair<const_iterator, const_iterator> equal_range_unique(const key_type& key)const
@@ -971,7 +1007,7 @@ namespace mystl
 	// 就地插入元素，键值允许重复
 	template<class T, class Compare>
 	template<class ...Args>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::emplace_multi(Args && ...args)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::emplace_multi(Args && ...args)
 	{
 		THROW_LENGTH_ERROR_IF(node_count_ > max_size() - 1, "rb_tree<T, Comp>'s size too big");
 		node_ptr np = create_node(mystl::forward<Args>(args)...);
@@ -1000,7 +1036,7 @@ namespace mystl
 	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::emplace_multi_use_hint(iterator hint, Args && ...args)
 	{
 		THROW_LENGTH_ERROR_IF(node_count_ > max_size() - 1, "rb_tree<T, Comp>'s size too big");
-		node_ptr np = create_node(mystl::forward(args)...);
+		node_ptr np = create_node(mystl::forward<Args>(args)...);
 		if (node_count_ == 0)
 		{
 			return insert_node_at(header_, np, true);
@@ -1044,9 +1080,9 @@ namespace mystl
 			return insert_node_at(header_, np, true);
 		}
 		key_type key = value_traits::get_key(np->value);
-		if (hint = begin())
-		{
-			if (key_comp_(key, value_traits::get_key(*hint))
+		if (hint == begin())
+		{ // 位于 begin 处
+			if (key_comp_(key, value_traits::get_key(*hint)))
 			{
 				return insert_node_at(hint.node, np, true);
 			}
@@ -1062,7 +1098,7 @@ namespace mystl
 			}
 		}
 		else if (hint == end())
-		{
+		{ // 位于 end 处
 			if (key_comp_(value_traits::get_key(rightmost()->get_node_ptr()->value), key))
 			{
 				return insert_node_at(rightmost(), np, false);
@@ -1082,7 +1118,7 @@ namespace mystl
 	}
 
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_multi(const value_type& value)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_multi(const value_type& value)
 	{
 		THROW_LENGTH_ERROR_IF(node_count_ > max_size() - 1, "rb_tree<T, Comp>'s size too big");
 		auto res = get_insert_multi_pos(value_traits::get_key(value));
@@ -1101,7 +1137,7 @@ namespace mystl
 	}
 
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::erase(iterator hint)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::erase(iterator hint)
 	{
 		auto node = hint.node->get_node_ptr();
 		iterator next(node);
@@ -1113,7 +1149,7 @@ namespace mystl
 		return next;
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::size_type rb_tree<T, Compare>::erase_multi(const key_type& key)
+	inline typename rb_tree<T, Compare>::size_type rb_tree<T, Compare>::erase_multi(const key_type& key)
 	{
 		auto p = equal_range_multi(key);
 		size_type n = mystl::distance(p.first, p.second);
@@ -1121,7 +1157,7 @@ namespace mystl
 		return n;
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::size_type rb_tree<T, Compare>::erase_unique(const key_type& key)
+	inline typename rb_tree<T, Compare>::size_type rb_tree<T, Compare>::erase_unique(const key_type& key)
 	{
 		auto it = find(key);
 		if (it != end())
@@ -1160,7 +1196,7 @@ namespace mystl
 	}
 	
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::find(const key_type& key)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::find(const key_type& key)
 	{
 		auto y = header_;  // 最后一个不小于 key 的节点
 		auto x = root();
@@ -1179,7 +1215,7 @@ namespace mystl
 		return (j == end() || key_comp_(key, value_traits::get_key(*j))) ? end() : j;
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::const_iterator rb_tree<T, Compare>::find(const key_type& key) const
+	inline typename rb_tree<T, Compare>::const_iterator rb_tree<T, Compare>::find(const key_type& key) const
 	{
 		auto y = header_;  // 最后一个不小于 key 的节点
 		auto x = root();
@@ -1187,18 +1223,19 @@ namespace mystl
 		{
 			if (!key_comp_(value_traits::get_key(x->get_node_ptr()->value), key))
 			{ // key 小于等于 x 键值，向左走
-				y = x, x = x->left;
+				y = x;
+				x = x->left;
 			}
 			else
 			{ // key 大于 x 键值，向右走
 				x = x->right;
 			}
 		}
-		iterator j = iterator(y);
+		const_iterator j = const_iterator(y);
 		return (j == end() || key_comp_(key, value_traits::get_key(*j))) ? end() : j;
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::lower_bound(const key_type& key)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::lower_bound(const key_type& key)
 	{
 		auto y = header_;
 		auto x = root();
@@ -1216,7 +1253,7 @@ namespace mystl
 		return iterator(y);
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::const_iterator rb_tree<T, Compare>::lower_bound(const key_type& key) const
+	inline typename rb_tree<T, Compare>::const_iterator rb_tree<T, Compare>::lower_bound(const key_type& key) const
 	{
 		auto y = header_;
 		auto x = root();
@@ -1234,7 +1271,7 @@ namespace mystl
 		return const_iterator(y);
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::upper_bound(const key_type& key)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::upper_bound(const key_type& key)
 	{
 		auto y = header_;
 		auto x = root();
@@ -1252,7 +1289,7 @@ namespace mystl
 		return iterator(y);
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::const_iterator rb_tree<T, Compare>::upper_bound(const key_type& key) const
+	inline typename rb_tree<T, Compare>::const_iterator rb_tree<T, Compare>::upper_bound(const key_type& key) const
 	{
 		auto y = header_;
 		auto x = root();
@@ -1284,12 +1321,12 @@ namespace mystl
 
 	template<class T, class Compare>
 	template<class ...Args>
-	inline rb_tree<T, Compare>::node_ptr rb_tree<T, Compare>::create_node(Args && ...args)
+	inline typename rb_tree<T, Compare>::node_ptr rb_tree<T, Compare>::create_node(Args && ...args)
 	{
 		auto tmp = node_allocator::allocate(1);
 		try
 		{
-			data_allocator::construct(mystl::address_of(tmp->value),mystl::forward(args)...);
+			data_allocator::construct(mystl::address_of(tmp->value),mystl::forward<Args>(args)...);
 			tmp->left = tmp->right = tmp->parent = nullptr;
 		}
 		catch (...)
@@ -1301,7 +1338,7 @@ namespace mystl
 	}
 
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::node_ptr rb_tree<T, Compare>::clone_node(base_ptr x)
+	inline typename rb_tree<T, Compare>::node_ptr rb_tree<T, Compare>::clone_node(base_ptr x)
 	{
 		node_ptr tmp = create_node(x->get_node_ptr()->value);
 		tmp->color = x->color;
@@ -1311,7 +1348,7 @@ namespace mystl
 	template<class T, class Compare>
 	inline void rb_tree<T, Compare>::destroy_node(node_ptr p)
 	{
-		data_allocator::destroy(p);
+		data_allocator::destroy(&p->value);
 		node_allocator::deallocate(p);
 	}
 	template<class T, class Compare>
@@ -1383,7 +1420,7 @@ namespace mystl
 	// insert_value_at 函数
 	// x 为插入点的父节点， value 为要插入的值，add_to_left 表示是否在左边插入
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_value_at(base_ptr x, const value_type& value, bool add_to_left)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_value_at(base_ptr x, const value_type& value, bool add_to_left)
 	{
 		node_ptr node = create_node(value);
 		node->parent = x;
@@ -1404,7 +1441,7 @@ namespace mystl
 			if (rightmost() == x)
 				rightmost() = base_node;
 		}
-		rb_tree_insert_rebalance(base_node, root);
+		rb_tree_insert_rebalance(base_node, root());
 		++node_count_;
 		return iterator(node);
 	}
@@ -1412,7 +1449,7 @@ namespace mystl
 	// 在 x 节点处插入新的节点
 	// x 为插入点的父节点， node 为要插入的节点，add_to_left 表示是否在左边插入
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_node_at(base_ptr x, node_ptr node, bool add_to_left)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_node_at(base_ptr x, node_ptr node, bool add_to_left)
 	{
 		node->parent = x;
 		auto base_node = node->get_base_ptr();
@@ -1432,14 +1469,14 @@ namespace mystl
 			if (rightmost() == x)
 				rightmost() = base_node;
 		}
-		rb_tree_insert_rebalance(base_node, root);
+		rb_tree_insert_rebalance(base_node, root());
 		++node_count_;
 		return iterator(node);
 	}
 
 	// 插入元素，键值允许重复，使用 hint
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_multi_use_hint(iterator hint, key_type key, node_ptr node)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_multi_use_hint(iterator hint, key_type key, node_ptr node)
 	{
 		// 在 hint 附近寻找可插入的位置
 		auto np = hint.node;
@@ -1463,7 +1500,7 @@ namespace mystl
 
 	// 插入元素，键值不允许重复，使用 hint
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_unique_use_hint(iterator hint, key_type key, node_ptr node)
+	inline typename rb_tree<T, Compare>::iterator rb_tree<T, Compare>::insert_unique_use_hint(iterator hint, key_type key, node_ptr node)
 	{
 		auto np = hint.node;
 		auto before = hint;
@@ -1489,7 +1526,7 @@ namespace mystl
 		return insert_node_at(pos.first.first, node, pos.first.second);
 	}
 	template<class T, class Compare>
-	inline rb_tree<T, Compare>::base_ptr rb_tree<T, Compare>::copy_from(base_ptr x, base_ptr p)
+	inline typename rb_tree<T, Compare>::base_ptr rb_tree<T, Compare>::copy_from(base_ptr x, base_ptr p)
 	{
 		auto top = clone_node(x);
 		top->parent = p;

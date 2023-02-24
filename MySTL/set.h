@@ -72,7 +72,7 @@ namespace mystl
 
 		set& operator=(set&& rhs)
 		{
-			tree = mystl::move(rhs.tree_);
+			tree_ = mystl::move(rhs.tree_);
 			return *this;
 		}
 
@@ -275,7 +275,7 @@ namespace mystl
 	/*****************************************************************************************/
 	// 模板类 multiset，键值允许重复
 	// 参数一代表键值类型，参数二代表键值比较方式，缺省使用 mystl::less 
-	template<class Key,class Compare>
+	template<class Key,class Compare = mystl::less<Key>>
 	class multiset
 	{
 	public:
@@ -345,8 +345,8 @@ namespace mystl
 
 		// 相关接口
 
-		key_compare      key_comp()      const { return tree_.key_comp(); }
-		value_compare    value_comp()    const { return tree_.key_comp(); }
+		key_comp      get_key_comp()      const { return tree_.key_comp(); }
+		value_comp    get_value_comp()    const { return tree_.key_comp(); }
 		allocator_type   get_allocator() const { return tree_.get_allocator(); }
 
 		// 迭代器相关

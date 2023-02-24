@@ -16,6 +16,18 @@
     <Filter Include="Test">
       <UniqueIdentifier>{ecf93f35-6a95-4b4b-8d16-11b28f323600}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\algorithm">
+      <UniqueIdentifier>{b1d6d859-2527-455a-a070-794ea7a79295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\iterator">
+      <UniqueIdentifier>{aa0c9fe3-869a-4b79-9d14-2bc29bcdda49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\allocator">
+      <UniqueIdentifier>{6c2b5330-4fc9-47c2-b33a-1dbb1f96b47f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\function">
+      <UniqueIdentifier>{98b637fa-7d31-493f-88ee-927def47a129}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MySTL.cpp">
@@ -23,46 +35,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="allocator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="construct.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="type_traits.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="utilities.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="vector.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="memory.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="uninitialized.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="algobase.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="iterator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="algo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="functional.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="exceptiondef.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="heap_algo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="algorithm.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="algo_performance_test.h">
@@ -85,6 +58,51 @@
     </ClInclude>
     <ClInclude Include="set.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="algo.h">
+      <Filter>头文件\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algobase.h">
+      <Filter>头文件\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm.h">
+      <Filter>头文件\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="iterator.h">
+      <Filter>头文件\iterator</Filter>
+    </ClInclude>
+    <ClInclude Include="allocator.h">
+      <Filter>头文件\allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="construct.h">
+      <Filter>头文件\allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="memory.h">
+      <Filter>头文件\allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="heap_algo.h">
+      <Filter>头文件\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="type_traits.h">
+      <Filter>头文件\function</Filter>
+    </ClInclude>
+    <ClInclude Include="functional.h">
+      <Filter>头文件\function</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities.h">
+      <Filter>头文件\function</Filter>
+    </ClInclude>
+    <ClInclude Include="uninitialized.h">
+      <Filter>头文件\function</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptiondef.h">
+      <Filter>头文件\function</Filter>
+    </ClInclude>
+    <ClInclude Include="deque_test.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="set_test.h">
+      <Filter>Test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

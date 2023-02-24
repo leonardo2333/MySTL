@@ -12,6 +12,9 @@
 #endif // check memory leaks
 
 #include "vector_test.h"
+#include "algo_performance_test.h"
+#include "deque_test.h"
+#include "set_test.h"
 
 int main()
 {
@@ -20,8 +23,12 @@ int main()
 	std::cout.sync_with_stdio(false);
 
 	RUN_ALL_TEST();
-
+	algo_performance_test::algorithm_performance_test();
 	vector_test::vector_test();
+	deque_test::deque_test();
+	set_test::set_test();
+	set_test::multiset_test();
+	
 
 #if defined(_MSC_VER)||defined(_DEBUG)
 	_CrtDumpMemoryLeaks();

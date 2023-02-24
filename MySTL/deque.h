@@ -41,7 +41,7 @@ namespace mystl
 	template<class T>
 	struct deque_buf_size
 	{
-		static constexpr size_t value = max(4096/sizeof(T),16);
+		static constexpr size_t value = sizeof(T) < 256 ? 4096 / sizeof(T) : 16;
 	};
 
 	//deque的迭代器
@@ -70,7 +70,7 @@ namespace mystl
 
 		// 构造、复制、移动函数
 		deque_iterator()noexcept
-			:cur(), first(), last(), node(){}
+			:cur(nullptr), first(nullptr), last(nullptr), node(nullptr){}
 
 		deque_iterator(value_pointer v, map_pointer n)
 			:cur(v), first(*n), last(*n + buffer_size), node(n){}
@@ -81,7 +81,10 @@ namespace mystl
 		deque_iterator(iterator&& rhs) noexcept
 			:cur(rhs.cur), first(rhs.first), last(rhs.last), node(rhs.node) 
 		{
-			rhs.cur = rhs.first = rhs.last = rhs.node = nullptr;
+			rhs.cur = nullptr;
+			rhs.first = nullptr;
+			rhs.last = nullptr;
+			rhs.node = nullptr;
 		}
 
 		deque_iterator(const const_iterator& rhs)
@@ -89,7 +92,7 @@ namespace mystl
 
 		self& operator=(const iterator& rhs)
 		{
-			if (this != rhs)
+			if (this != &rhs)
 			{
 				cur = rhs.cur;
 				first = rhs.first;
@@ -113,7 +116,7 @@ namespace mystl
 
 		difference_type operator-(const self& x)const
 		{
-return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - first) - (x.cur - x.first);
+			return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - first) - (x.cur - x.first);
 		}
 
 		self& operator++()
@@ -124,10 +127,10 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 				set_node(node + 1);
 				cur = first;
 			}
-			return cur;
+			return *this;
 		}
 
-		self& operator++(int)
+		self operator++(int)
 		{
 			self tmp = *this;
 			++* this;
@@ -142,10 +145,10 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 				cur = last;
 			}
 			--cur;
-			return cur;
+			return *this;
 		}
 
-		self& operator--(int)
+		self operator--(int)
 		{
 			self tmp = *this;
 			--* this;
@@ -169,26 +172,27 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 			return *this;
 		}
 
-		self& operator+(difference_type n)
+		self operator+(difference_type n)
 		{
 			auto tmp = *this;
 			return tmp += n;
 		}
 
+		self operator+(difference_type n) const
+		{
+			self tmp = *this;
+			return tmp += n;
+		}
+		
 		self& operator-=(difference_type n)
 		{
-			return tmp += -n;
+			return *this += -n;
 		}
 
-		self& operator-(difference_type n)
+		self operator-(difference_type n) const
 		{
-			auto tmp = *this;
+			self tmp = *this;
 			return tmp -= n;
-		}
-
-		reference operator[](difference_type n)const
-		{
-			return *(*this + n);
 		}
 
 		//重载比较操作符
@@ -204,7 +208,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 
 		bool operator<=(const self& rhs) const
 		{
-			return !*this > rhs;
+			return !( * this > rhs);
 		}
 
 		bool operator>(const self& rhs) const
@@ -214,12 +218,12 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 
 		bool operator>=(const self& rhs) const
 		{
-			return !*this < rhs;
+			return !( * this < rhs);
 		}
 
 		bool operator!=(const self& rhs) const
 		{
-			return !*this == rhs;
+			return !( * this == rhs);
 		}
 	};
 
@@ -277,7 +281,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 			fill_init(n, v);
 		}
 
-		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value>::type>
+		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value,int>::type=0>
 		deque(Iter first, Iter last)
 		{
 			copy_init(first, last, iterator_category(first));
@@ -403,19 +407,19 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 			resize(new_size, value_type());
 		}
 
-		void resize(size_type new_size, value_type& value);
+		void resize(size_type new_size, const value_type& value);
 		void shrink_to_fit() noexcept;
 
 		reference operator[](size_type n)
 		{
 			MYSTL_DEBUG(n < size());
-			return begin_[n];
+			return *(begin_+n);
 		}
 
 		const_reference operator[](size_type n)const
 		{
 			MYSTL_DEBUG(n < size());
-			return begin_[n];
+			return *(begin_ + n);
 		}
 
 		reference at(size_type n)
@@ -460,7 +464,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 			fill_assign(n, val);
 		}
 
-		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value,int>::type>
+		template<class Iter,typename std::enable_if<mystl::is_input_iterator<Iter>::value,int>::type=0>
 		void assign(Iter first, Iter last)
 		{
 			copy_assign(first, last, iterator_category(first));
@@ -593,7 +597,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 	}
 
 	template<class T>
-	inline void deque<T>::resize(size_type new_size, value_type& value)
+	inline void deque<T>::resize(size_type new_size, const value_type& value)
 	{
 		if (size() > new_size)
 		{
@@ -967,7 +971,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 		}
 
 		//让nstart和nfinish指向map_中央区域，方便头尾扩展
-		map_pointer nstart = map_ + (map_size_ - nnode) >> 1;
+		map_pointer nstart = map_ + ((map_size_ - nnode) >> 1);
 		map_pointer nfinish = nstart + nnode - 1;
 		try
 		{
@@ -1034,7 +1038,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 	{
 		if (n > size())
 		{
-			mystl::unchecked_uninit_fill(begin(), end(), value);
+			mystl::fill(begin(), end(), value);
 			insert(end(), n - size(), value);
 		}
 		else
@@ -1271,7 +1275,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 		if (last <= first)
 			return;
 		const size_type n = mystl::distance(first, last);
-		const elems_before = position - begin_;
+		const size_type elems_before = position - begin_;
 		if (elems_before < (size() >> 1))
 			require_capacity(n, true);
 		else
@@ -1286,7 +1290,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 
 	template<class T>
 	template<class FIter>
-	inline void deque<T>::insert_dispatch(iterator, FIter, FIter, forward_iterator_tag)
+	inline void deque<T>::insert_dispatch(iterator position, FIter first, FIter last, forward_iterator_tag)
 	{
 		if (last <= first)  return;
 		const size_type n = mystl::distance(first, last);
@@ -1346,7 +1350,7 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 		else if (!front && static_cast<size_type>(end().last - end().cur - 1) < n)
 		{
 			const size_type need_buffer = (n - (end().last - end().cur - 1)) / buffer_size + 1;
-			if (need_buffer > static_cast<size_type>(map_ - map_size_) - end().node - 1)
+			if (need_buffer > static_cast<size_type>((map_ + map_size_) - end().node - 1))
 			{
 				reallocate_map_at_back(need_buffer);
 				return;
@@ -1363,11 +1367,11 @@ return static_cast<difference_type>(buffer_size) * (node - x.node) + (cur - firs
 		const size_type old_buffer = end().node - begin().node + 1;
 		const size_type new_buffer = old_buffer + need_buffer;
 
-		auto begin = new_map + (new_map_size - new_buffer) >> 1;
-		auto mid = begin() + need_buffer;
+		auto begin = new_map + ((new_map_size - new_buffer) >> 1);
+		auto mid = begin + need_buffer;
 		auto end = mid + old_buffer;
-		create_buffer(begin(), mid - 1);
-		for (auto begin1 = mid, begin2 = begin().node; begin1 != end; ++begin1, ++begin2)
+		create_buffer(begin, mid - 1);
+		for (auto begin1 = mid, begin2 = begin_.node; begin1 != end; ++begin1, ++begin2)
 			*begin1 = *begin2;
 
 		map_allocator::deallocate(map_, map_size_);

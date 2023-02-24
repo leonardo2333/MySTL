@@ -1835,7 +1835,7 @@ namespace mystl
 		{
 			if (*i < *first)
 			{
-				mystl::pop_heap_aux(first, mid, i, *i, distance_type(first));
+				mystl::pop_heap_aux(first, mid, i, *i, difference_type(first));
 			}
 		}
 		mystl::sort_heap(first, mid);
@@ -1848,7 +1848,7 @@ namespace mystl
 		for (auto i = mid; i < last; ++i)
 		{
 			if (comp(*i, *first))
-				mystl::pop_heap_aux(first, mid, i, *i, distance_type(first));
+				mystl::pop_heap_aux(first, mid, i, *i, difference_type(first));
 		}
 		mystl::sort_heap(first, mid);
 	}
@@ -1882,7 +1882,7 @@ namespace mystl
 	template<class InputIter,class RandomIter>
 	RandomIter partial_sort_copy(InputIter first, InputIter last, RandomIter res_first, RandomIter res_last)
 	{
-		return mystl::partial_sort_copy_aux(first, last, res_first, res_last, distance_type(res_first));
+		return mystl::partial_sort_copy_aux(first, last, res_first, res_last, difference_type(res_first));
 	}
 
 	template<class InputIter, class RandomIter, class Distance,class Compare>
@@ -1914,7 +1914,7 @@ namespace mystl
 	template<class InputIter, class RandomIter,class Compare>
 	RandomIter partial_sort_copy(InputIter first, InputIter last, RandomIter res_first, RandomIter res_last,Compare comp)
 	{
-		return mystl::partial_sort_copy_aux(first, last, res_first, res_last, distance_type(res_first),comp);
+		return mystl::partial_sort_copy_aux(first, last, res_first, res_last, difference_type(res_first),comp);
 	}
 
 	//partition
@@ -2066,7 +2066,7 @@ namespace mystl
 			}
 			else
 			{
-				mystl::unchecked_insertion_sort(i, value);
+				mystl::unchecked_linear_insert(i, value);
 			}
 		}
 	}
